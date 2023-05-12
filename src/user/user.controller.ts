@@ -1,4 +1,4 @@
-import { CreateUserDto } from './create-user.dto';
+import { CreateUserDto, UpdateUserDto } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import {
@@ -9,13 +9,14 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @Get()
   async findAll(@Res() res: Response): Promise<Response> {
@@ -65,6 +66,23 @@ export class UserController {
     try {
       await this.userService.delete(id);
       res.status(HttpStatus.OK).send();
+    } catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).send();
+    }
+  }
+
+  @Put('/:id')
+  async updateById(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Res() res: Response
+  ): Promise<Response> {
+    try {
+      const { name, age, gender } = updateUserDto
+      const userId = +id
+      const newUser = { id: userId, name, age, gender }
+      const user = await this.userService.update(newUser);
+      return res.status(HttpStatus.OK).json(user);
     } catch (error) {
       res.status(HttpStatus.BAD_REQUEST).send();
     }

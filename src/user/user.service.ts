@@ -64,4 +64,15 @@ export class UserService {
       throw error;
     }
   }
+
+  async update(user: User): Promise<User> {
+    Object.keys(user).forEach(key => {
+      if (typeof user[key] === 'undefined') {
+        delete user[key];
+      }
+    });
+    const index = this.users.findIndex((u) => u.id === user.id);
+    this.users[index] = { ...this.users[index], ...user }
+    return this.users[index]
+  }
 }
