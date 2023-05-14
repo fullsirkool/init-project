@@ -1,4 +1,5 @@
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import moment from 'moment';
+import { CreateUserDto, FindUserDto, UpdateUserDto } from './user.dto';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 import {
@@ -16,27 +17,33 @@ import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @Get()
-  async findAll(@Res() res: Response): Promise<Response> {
+  async findAll(
+    @Param() findUserDto: FindUserDto,
+    @Res() res: Response
+  ): Promise<Response> {
     try {
-      const users = await this.userService.findAll();
+      const { page, size, query, order } = findUserDto;
+      const users = await this.userService.findAll(page, size, query, order);
       return res.status(HttpStatus.OK).json(users);
     } catch (error) {
+      console.log(error);
       return res.status(HttpStatus.BAD_REQUEST).send();
     }
   }
 
   @Get('/:id')
-  async findById(
+  async findOne(
     @Param('id') id: string,
     @Res() res: Response
   ): Promise<Response> {
     try {
-      const user: User = await this.userService.findById(id);
+      const user: User = await this.userService.findOne(+id);
       return res.status(HttpStatus.OK).json(user);
     } catch (error) {
+      console.log(error);
       return res.status(HttpStatus.BAD_REQUEST).send();
     }
   }
@@ -50,10 +57,13 @@ export class UserController {
       console.log('createUserDto', createUserDto);
       const { name, age, gender } = createUserDto;
       const id = 0;
-      const user = { id, name, age, gender };
+      const createdAt = new Date();
+      const updatedAt = undefined;
+      const user = { id, name, age, gender, createdAt, updatedAt };
       await this.userService.create(user);
       res.status(HttpStatus.CREATED).send();
     } catch (error) {
+      console.log(error);
       res.status(HttpStatus.BAD_REQUEST).send();
     }
   }
@@ -64,9 +74,10 @@ export class UserController {
     @Res() res: Response
   ): Promise<void> {
     try {
-      await this.userService.delete(id);
+      await this.userService.remove(+id);
       res.status(HttpStatus.OK).send();
     } catch (error) {
+      console.log(error);
       res.status(HttpStatus.BAD_REQUEST).send();
     }
   }
@@ -78,12 +89,15 @@ export class UserController {
     @Res() res: Response
   ): Promise<Response> {
     try {
-      const { name, age, gender } = updateUserDto
-      const userId = +id
-      const newUser = { id: userId, name, age, gender }
+      const { name, age, gender } = updateUserDto;
+      const userId = +id;
+      const createdAt = undefined;
+      const updatedAt = new Date();
+      const newUser = { id: userId, name, age, gender, createdAt, updatedAt };
       const user = await this.userService.update(newUser);
       return res.status(HttpStatus.OK).json(user);
     } catch (error) {
+      console.log(error);
       res.status(HttpStatus.BAD_REQUEST).send();
     }
   }
