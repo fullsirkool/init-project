@@ -7,6 +7,8 @@ import configuration from '../config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from './user/user.entity';
+import { CategoryModule } from './category/category.module';
+import { Category } from './category/category.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,9 +22,10 @@ import { User } from './user/user.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User],
+      entities: [User, Category],
       synchronize: true,
     }),
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
