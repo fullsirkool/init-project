@@ -59,7 +59,8 @@ export class UserController {
       const id = 0;
       const createdAt = new Date();
       const updatedAt = undefined;
-      const user = { id, name, age, gender, createdAt, updatedAt };
+      const categories = [];
+      const user = { id, name, age, gender, createdAt, updatedAt, categories };
       await this.userService.create(user);
       res.status(HttpStatus.CREATED).send();
     } catch (error) {
@@ -93,7 +94,16 @@ export class UserController {
       const userId = +id;
       const createdAt = undefined;
       const updatedAt = new Date();
-      const newUser = { id: userId, name, age, gender, createdAt, updatedAt };
+      const categories = [];
+      const newUser = {
+        id: userId,
+        name,
+        age,
+        gender,
+        createdAt,
+        updatedAt,
+        categories,
+      };
       const user = await this.userService.update(newUser);
       return res.status(HttpStatus.OK).json(user);
     } catch (error) {
